@@ -5,7 +5,7 @@ export default function MapSection() {
       <div className="map-card">
         <iframe
           className="map-frame"
-          src="https://maps.google.com/maps?q=26.301916,50.180946&z=17&output=embed"
+          src="https://maps.google.com/maps?q=24.78415,46.7259482&z=17&output=embed"
           allowFullScreen
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
@@ -18,11 +18,11 @@ export default function MapSection() {
               <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/>
               <circle cx="12" cy="10" r="3"/>
             </svg>
-            Football Field - Riyadh
+            Al-Rawad Fields — Riyadh
           </span>
           <a
             className="btn-directions"
-            href="https://maps.app.goo.gl/8Q4BdFvJXoATFDeq7"
+            href="https://maps.app.goo.gl/ox34GqnsVmi3ownX6"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Open directions in Google Maps"
