@@ -1,0 +1,6 @@
+[project]
+# Your Supabase project reference ID (find it in Project Settings → General)
+# project_id = "your-project-ref"
+
+[functions.notify-email]
+verify_jwt = false
