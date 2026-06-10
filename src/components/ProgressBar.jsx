@@ -1,4 +1,4 @@
-export default function ProgressBar({ count, maxPlayers = 10 }) {
+export default function ProgressBar({ count, maxPlayers = 14 }) {
   const pct = Math.min((count / maxPlayers) * 100, 100)
   const reached = count >= maxPlayers
   const needed = maxPlayers - count

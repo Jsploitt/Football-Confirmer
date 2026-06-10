@@ -13,7 +13,7 @@ function useDebouncedCallback(fn, delay) {
 export function useAttendance() {
   const [confirmed, setConfirmed] = useState([])
   const [maybe, setMaybe] = useState([])
-  const [maxPlayers, setMaxPlayers] = useState(10)
+  const [maxPlayers, setMaxPlayers] = useState(14)
 
   const fetchAttendance = useCallback(async () => {
     const { data, error } = await supabase
