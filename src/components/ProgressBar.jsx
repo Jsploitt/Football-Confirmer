@@ -1,16 +1,14 @@
-const TARGET = 10
-
-export default function ProgressBar({ count }) {
-  const pct = Math.min((count / TARGET) * 100, 100)
-  const reached = count >= TARGET
-  const needed = TARGET - count
+export default function ProgressBar({ count, maxPlayers = 10 }) {
+  const pct = Math.min((count / maxPlayers) * 100, 100)
+  const reached = count >= maxPlayers
+  const needed = maxPlayers - count
 
   return (
     <div className="progress-wrap">
       <div className="progress-header">
         <span className="progress-label">Confirmed Players</span>
         <span className={`progress-count${reached ? ' reached' : ''}`}>
-          <span>{count}</span>&nbsp;/ 10
+          <span>{count}</span>&nbsp;/ {maxPlayers}
         </span>
       </div>
       <div className="progress-track">

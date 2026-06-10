@@ -13,6 +13,7 @@ function useDebouncedCallback(fn, delay) {
 export function useAttendance() {
   const [confirmed, setConfirmed] = useState([])
   const [maybe, setMaybe] = useState([])
+  const [maxPlayers, setMaxPlayers] = useState(10)
 
   const fetchAttendance = useCallback(async () => {
     const { data, error } = await supabase
@@ -27,6 +28,18 @@ export function useAttendance() {
 
     setConfirmed(data.filter(r => r.status === 'confirmed').map(r => r.name))
     setMaybe(data.filter(r => r.status === 'maybe').map(r => r.name))
+  }, [])
+
+  const fetchConfig = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('config')
+      .select('max_players')
+      .single()
+    if (error) {
+      console.error('fetchConfig:', error.message)
+      return
+    }
+    if (data) setMaxPlayers(data.max_players)
   }, [])
 
   // 400 ms debounce — burst of realtime events becomes one SELECT
@@ -48,6 +61,7 @@ export function useAttendance() {
   }, [])
 
   useEffect(() => {
+    fetchConfig()
     fetchAttendance()
 
     const channel = supabase
@@ -57,10 +71,15 @@ export function useAttendance() {
         { event: '*', schema: 'public', table: 'attendance' },
         debouncedFetch,
       )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'config' },
+        fetchConfig,
+      )
       .subscribe()
 
     return () => supabase.removeChannel(channel)
-  }, [fetchAttendance, debouncedFetch])
+  }, [fetchAttendance, fetchConfig, debouncedFetch])
 
-  return { confirmed, maybe, upsertPlayer, deletePlayer }
+  return { confirmed, maybe, maxPlayers, upsertPlayer, deletePlayer }
 }

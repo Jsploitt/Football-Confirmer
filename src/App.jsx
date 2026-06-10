@@ -8,7 +8,7 @@ import Toast from './components/Toast'
 import { useAttendance } from './hooks/useAttendance'
 
 export default function App() {
-  const { confirmed, maybe, upsertPlayer, deletePlayer } = useAttendance()
+  const { confirmed, maybe, maxPlayers, upsertPlayer, deletePlayer } = useAttendance()
   const [toast, setToast] = useState(null)
 
   const showToast = useCallback((msg, type) => {
@@ -35,7 +35,7 @@ export default function App() {
       <main>
         <div className="section" style={{ paddingBottom: 0 }}>
           <div className="section-title">Squad Status</div>
-          <ProgressBar count={confirmed.length} />
+          <ProgressBar count={confirmed.length} maxPlayers={maxPlayers} />
         </div>
         <div className="section" style={{ paddingTop: 0, paddingBottom: 0 }}>
           <div className="section-title" style={{ marginTop: '2rem' }}>Your Response</div>
