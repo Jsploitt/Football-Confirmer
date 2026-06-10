@@ -1,0 +1,71 @@
+function getInitial(name) {
+  return (name.trim()[0] || '?').toUpperCase()
+}
+
+function EmptyState() {
+  return (
+    <div className="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+      <div>No players yet</div>
+    </div>
+  )
+}
+
+function PlayerBadge({ name, type }) {
+  return (
+    <div className={`player-badge player-badge-${type}`}>
+      <div className={`player-avatar player-avatar-${type}`}>{getInitial(name)}</div>
+      <span className="player-name">{name}</span>
+    </div>
+  )
+}
+
+export default function PlayerLists({ confirmed, maybe }) {
+  return (
+    <div className="lists-grid">
+
+      <div className="list-card">
+        <div className="list-header">
+          <span className="list-title list-title-confirmed">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 2a10 10 0 0 1 6.76 2.64M12 2a10 10 0 0 0-6.76 2.64"/>
+            </svg>
+            Confirmed
+          </span>
+          <span className="list-count list-count-confirmed">{confirmed.length}</span>
+        </div>
+        <div className="player-list" aria-live="polite" aria-label="Confirmed players">
+          {confirmed.length === 0
+            ? <EmptyState />
+            : confirmed.map(name => <PlayerBadge key={name} name={name} type="confirmed" />)
+          }
+        </div>
+      </div>
+
+      <div className="list-card">
+        <div className="list-header">
+          <span className="list-title list-title-maybe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            Maybe
+          </span>
+          <span className="list-count list-count-maybe">{maybe.length}</span>
+        </div>
+        <div className="player-list" aria-live="polite" aria-label="Maybe players">
+          {maybe.length === 0
+            ? <EmptyState />
+            : maybe.map(name => <PlayerBadge key={name} name={name} type="maybe" />)
+          }
+        </div>
+      </div>
+
+    </div>
+  )
+}
