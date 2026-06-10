@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+
+const COOLDOWN_MS = 4000
 
 function sanitizeName(raw) {
   return raw.trim().replace(/\s+/g, ' ')
@@ -8,6 +10,8 @@ export default function RSVPForm({ onRSVP }) {
   const [name, setName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [cooldown, setCooldown] = useState(false)
+  const cooldownTimer = useRef(null)
 
   async function handleClick(status) {
     const clean = sanitizeName(name)
@@ -22,6 +26,10 @@ export default function RSVPForm({ onRSVP }) {
     try {
       await onRSVP(clean, status)
       setName('')
+      // Block resubmission for COOLDOWN_MS after a successful write
+      setCooldown(true)
+      clearTimeout(cooldownTimer.current)
+      cooldownTimer.current = setTimeout(() => setCooldown(false), COOLDOWN_MS)
     } catch {
       setError('Something went wrong. Please try again.')
     } finally {
@@ -48,7 +56,7 @@ export default function RSVPForm({ onRSVP }) {
         <button
           className="btn btn-confirmed"
           onClick={() => handleClick('confirmed')}
-          disabled={loading}
+          disabled={loading || cooldown}
           aria-label="Mark as confirmed"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -59,7 +67,7 @@ export default function RSVPForm({ onRSVP }) {
         <button
           className="btn btn-maybe"
           onClick={() => handleClick('maybe')}
-          disabled={loading}
+          disabled={loading || cooldown}
           aria-label="Mark as maybe"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -72,7 +80,7 @@ export default function RSVPForm({ onRSVP }) {
         <button
           className="btn btn-cancelled"
           onClick={() => handleClick('cancelled')}
-          disabled={loading}
+          disabled={loading || cooldown}
           aria-label="Cancel attendance"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

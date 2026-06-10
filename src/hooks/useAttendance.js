@@ -1,5 +1,14 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabase'
+
+// Coalesces rapid realtime events into a single fetch
+function useDebouncedCallback(fn, delay) {
+  const timer = useRef(null)
+  return useCallback((...args) => {
+    clearTimeout(timer.current)
+    timer.current = setTimeout(() => fn(...args), delay)
+  }, [fn, delay])
+}
 
 export function useAttendance() {
   const [confirmed, setConfirmed] = useState([])
@@ -19,6 +28,9 @@ export function useAttendance() {
     setConfirmed(data.filter(r => r.status === 'confirmed').map(r => r.name))
     setMaybe(data.filter(r => r.status === 'maybe').map(r => r.name))
   }, [])
+
+  // 400 ms debounce — burst of realtime events becomes one SELECT
+  const debouncedFetch = useDebouncedCallback(fetchAttendance, 400)
 
   // Case-insensitive upsert: delete any existing name match, then insert fresh row
   const upsertPlayer = useCallback(async (name, status) => {
@@ -43,12 +55,12 @@ export function useAttendance() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'attendance' },
-        fetchAttendance,
+        debouncedFetch,
       )
       .subscribe()
 
     return () => supabase.removeChannel(channel)
-  }, [fetchAttendance])
+  }, [fetchAttendance, debouncedFetch])
 
   return { confirmed, maybe, upsertPlayer, deletePlayer }
 }
