@@ -4,6 +4,7 @@ import ProgressBar from './components/ProgressBar'
 import RSVPForm from './components/RSVPForm'
 import PlayerLists from './components/PlayerLists'
 import MapSection from './components/MapSection'
+import PaymentSection from './components/PaymentSection'
 import Toast from './components/Toast'
 import { useAttendance } from './hooks/useAttendance'
 
@@ -45,6 +46,7 @@ export default function App() {
           <div className="section-title">Player Lists</div>
           <PlayerLists confirmed={confirmed} maybe={maybe} />
         </div>
+        <PaymentSection />
         <MapSection />
       </main>
       <footer>
