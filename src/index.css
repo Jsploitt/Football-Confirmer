@@ -617,6 +617,38 @@ footer {
 .dot-amber    { background: var(--amber); }
 .dot-red      { background: var(--red); }
 
+/* ─── Paid Badge ────────────────────────────────────────────────── */
+.paid-badge {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.paid-badge--paid {
+  background: rgba(76,175,80,0.15);
+  color: var(--green);
+  border-color: rgba(76,175,80,0.35);
+}
+.paid-badge--paid:hover {
+  background: rgba(76,175,80,0.25);
+}
+.paid-badge--unpaid {
+  background: rgba(255,255,255,0.05);
+  color: var(--muted);
+  border-color: rgba(255,255,255,0.1);
+}
+.paid-badge--unpaid:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--white);
+  border-color: rgba(255,255,255,0.2);
+}
+
 /* ─── Payment Section ───────────────────────────────────────────── */
 .payment-card {
   background: var(--surface);

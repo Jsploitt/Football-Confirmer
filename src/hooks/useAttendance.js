@@ -14,6 +14,7 @@ export function useAttendance() {
   const [confirmed, setConfirmed] = useState([])
   const [maybe, setMaybe] = useState([])
   const [maxPlayers, setMaxPlayers] = useState(14)
+  const [paidPlayers, setPaidPlayers] = useState(new Set())
 
   const fetchAttendance = useCallback(async () => {
     const { data, error } = await supabase
@@ -28,6 +29,30 @@ export function useAttendance() {
 
     setConfirmed(data.filter(r => r.status === 'confirmed').map(r => r.name))
     setMaybe(data.filter(r => r.status === 'maybe').map(r => r.name))
+  }, [])
+
+  const fetchPayments = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('payments')
+      .select('name')
+      .eq('paid', true)
+    if (error) { console.error('fetchPayments:', error.message); return }
+    setPaidPlayers(new Set(data.map(r => r.name.toLowerCase())))
+  }, [])
+
+  const togglePaid = useCallback(async (name, currentlyPaid) => {
+    if (currentlyPaid) {
+      await supabase.from('payments').delete().eq('name', name)
+    } else {
+      await supabase.from('payments').upsert({ name, paid: true }, { onConflict: 'name' })
+    }
+    // optimistic update
+    setPaidPlayers(prev => {
+      const next = new Set(prev)
+      if (currentlyPaid) next.delete(name.toLowerCase())
+      else next.add(name.toLowerCase())
+      return next
+    })
   }, [])
 
   const fetchConfig = useCallback(async () => {
@@ -63,6 +88,7 @@ export function useAttendance() {
   useEffect(() => {
     fetchConfig()
     fetchAttendance()
+    fetchPayments()
 
     const channel = supabase
       .channel('attendance-changes')
@@ -76,10 +102,15 @@ export function useAttendance() {
         { event: '*', schema: 'public', table: 'config' },
         fetchConfig,
       )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'payments' },
+        fetchPayments,
+      )
       .subscribe()
 
     return () => supabase.removeChannel(channel)
-  }, [fetchAttendance, fetchConfig, debouncedFetch])
+  }, [fetchAttendance, fetchConfig, fetchPayments, debouncedFetch])
 
-  return { confirmed, maybe, maxPlayers, upsertPlayer, deletePlayer }
+  return { confirmed, maybe, maxPlayers, paidPlayers, upsertPlayer, deletePlayer, togglePaid }
 }
