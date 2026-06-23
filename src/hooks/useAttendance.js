@@ -161,10 +161,8 @@ export function useAttendance() {
     maybeRecords,
     maxPlayers,
     paidPlayers,
-    matchSettings,
     upsertPlayer,
     deletePlayer,
     togglePaid,
-    updateMatchSettings,
   }
 }

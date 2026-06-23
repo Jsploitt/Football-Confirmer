@@ -1,7 +1,6 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAttendance } from '../hooks/useAttendance'
-import { formatKickoff } from '../lib/matchDate'
 
 const SESSION_KEY = 'ffc_admin_session'
 
@@ -9,11 +8,9 @@ function getInitial(name) {
   return (name.trim()[0] || '?').toUpperCase()
 }
 
-function buildWhatsAppLink(whatsapp, name, matchSettings) {
+function buildWhatsAppLink(whatsapp, name) {
   const digits = whatsapp.replace(/[^\d]/g, '')
-  const fmt = formatKickoff(matchSettings.kickoffAt, matchSettings.durationMinutes)
-  const whenText = fmt ? `${fmt.weekdayLong} ${fmt.day} ${fmt.month}, ${fmt.startLabel}–${fmt.endLabel}` : 'the upcoming match'
-  const message = `Hey ${name}! 👋 Quick reminder about the match — ${whenText}${matchSettings.locationName ? ` at ${matchSettings.locationName}` : ''}. See you on the pitch! ⚽`
+  const message = `Hey ${name}! 👋 Quick reminder about the match — Thursday 25 June, 9:00–10:30 PM. See you on the pitch! ⚽`
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`
 }
 
@@ -75,7 +72,7 @@ function AdminLogin({ onLogin }) {
   )
 }
 
-function PlayerRow({ name, whatsapp, paid, onTogglePaid, matchSettings }) {
+function PlayerRow({ name, whatsapp, paid, onTogglePaid }) {
   return (
     <div className="admin-row">
       <div className="player-avatar player-avatar-confirmed">{getInitial(name)}</div>
@@ -89,7 +86,7 @@ function PlayerRow({ name, whatsapp, paid, onTogglePaid, matchSettings }) {
       {whatsapp ? (
         <a
           className="remind-btn"
-          href={buildWhatsAppLink(whatsapp, name, matchSettings)}
+          href={buildWhatsAppLink(whatsapp, name)}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -102,145 +99,8 @@ function PlayerRow({ name, whatsapp, paid, onTogglePaid, matchSettings }) {
   )
 }
 
-// timestamptz <-> <input type="datetime-local"> conversions, both in local time
-function toDatetimeLocalValue(isoString) {
-  if (!isoString) return ''
-  const d = new Date(isoString)
-  const pad = n => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
-
-function fromDatetimeLocalValue(localString) {
-  if (!localString) return null
-  return new Date(localString).toISOString()
-}
-
-function MatchSettingsForm({ matchSettings, updateMatchSettings }) {
-  const [form, setForm] = useState(null)
-  const [saving, setSaving] = useState(false)
-  const [status, setStatus] = useState('')
-
-  useEffect(() => {
-    if (matchSettings.id !== null && form === null) {
-      setForm({
-        kickoffLocal: toDatetimeLocalValue(matchSettings.kickoffAt),
-        durationMinutes: matchSettings.durationMinutes,
-        locationName: matchSettings.locationName,
-        locationAddress: matchSettings.locationAddress,
-        mapEmbedUrl: matchSettings.mapEmbedUrl,
-        directionsUrl: matchSettings.directionsUrl,
-      })
-    }
-  }, [matchSettings, form])
-
-  if (!form) return null
-
-  function set(field, value) {
-    setForm(f => ({ ...f, [field]: value }))
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setSaving(true)
-    setStatus('')
-    try {
-      await updateMatchSettings({
-        kickoffAt: fromDatetimeLocalValue(form.kickoffLocal),
-        durationMinutes: Number(form.durationMinutes) || 90,
-        locationName: form.locationName,
-        locationAddress: form.locationAddress,
-        mapEmbedUrl: form.mapEmbedUrl,
-        directionsUrl: form.directionsUrl,
-      })
-      setStatus('Saved — public page updated.')
-    } catch {
-      setStatus('Failed to save. Please try again.')
-    } finally {
-      setSaving(false)
-      setTimeout(() => setStatus(''), 4000)
-    }
-  }
-
-  return (
-    <form className="admin-settings-card" onSubmit={handleSubmit}>
-      <div className="admin-settings-grid">
-        <label className="admin-field">
-          <span className="admin-field-label">Kickoff date & time</span>
-          <input
-            type="datetime-local"
-            className="rsvp-input"
-            value={form.kickoffLocal}
-            onChange={e => set('kickoffLocal', e.target.value)}
-            required
-          />
-        </label>
-        <label className="admin-field">
-          <span className="admin-field-label">Duration (minutes)</span>
-          <input
-            type="number"
-            className="rsvp-input"
-            min={15}
-            step={15}
-            value={form.durationMinutes}
-            onChange={e => set('durationMinutes', e.target.value)}
-            required
-          />
-        </label>
-        <label className="admin-field">
-          <span className="admin-field-label">Location name</span>
-          <input
-            type="text"
-            className="rsvp-input"
-            placeholder="e.g. Al-Rawad Fields — Riyadh"
-            value={form.locationName}
-            onChange={e => set('locationName', e.target.value)}
-          />
-        </label>
-        <label className="admin-field">
-          <span className="admin-field-label">Location address</span>
-          <input
-            type="text"
-            className="rsvp-input"
-            placeholder="e.g. Riyadh, Saudi Arabia"
-            value={form.locationAddress}
-            onChange={e => set('locationAddress', e.target.value)}
-          />
-        </label>
-        <label className="admin-field admin-field--wide">
-          <span className="admin-field-label">Google Maps embed URL</span>
-          <input
-            type="url"
-            className="rsvp-input"
-            placeholder="https://maps.google.com/maps?q=...&output=embed"
-            value={form.mapEmbedUrl}
-            onChange={e => set('mapEmbedUrl', e.target.value)}
-          />
-        </label>
-        <label className="admin-field admin-field--wide">
-          <span className="admin-field-label">Directions link</span>
-          <input
-            type="url"
-            className="rsvp-input"
-            placeholder="https://maps.app.goo.gl/..."
-            value={form.directionsUrl}
-            onChange={e => set('directionsUrl', e.target.value)}
-          />
-        </label>
-      </div>
-      <div className="admin-settings-footer">
-        <button className="btn btn-confirmed" type="submit" disabled={saving}>
-          {saving ? 'Saving…' : 'Save match settings'}
-        </button>
-        {status && <span className="admin-settings-status">{status}</span>}
-      </div>
-    </form>
-  )
-}
-
 function AdminDashboard({ onLogout }) {
-  const {
-    confirmedRecords, maybeRecords, paidPlayers, togglePaid, matchSettings, updateMatchSettings,
-  } = useAttendance()
+  const { confirmedRecords, maybeRecords, paidPlayers, togglePaid } = useAttendance()
   const isPaid = name => paidPlayers.has(name.toLowerCase())
 
   return (
@@ -250,14 +110,11 @@ function AdminDashboard({ onLogout }) {
         <button className="btn btn-cancelled" onClick={onLogout}>Log out</button>
       </div>
 
-      <div className="section-title">Match Settings</div>
-      <MatchSettingsForm matchSettings={matchSettings} updateMatchSettings={updateMatchSettings} />
-
-      <div className="section-title" style={{ marginTop: '2rem' }}>Confirmed ({confirmedRecords.length})</div>
+      <div className="section-title">Confirmed ({confirmedRecords.length})</div>
       <div className="admin-list">
         {confirmedRecords.length === 0 && <div className="empty-state"><div>No players yet</div></div>}
         {confirmedRecords.map(r => (
-          <PlayerRow key={r.name} name={r.name} whatsapp={r.whatsapp} paid={isPaid(r.name)} onTogglePaid={togglePaid} matchSettings={matchSettings} />
+          <PlayerRow key={r.name} name={r.name} whatsapp={r.whatsapp} paid={isPaid(r.name)} onTogglePaid={togglePaid} />
         ))}
       </div>
 
@@ -265,7 +122,7 @@ function AdminDashboard({ onLogout }) {
       <div className="admin-list">
         {maybeRecords.length === 0 && <div className="empty-state"><div>No players yet</div></div>}
         {maybeRecords.map(r => (
-          <PlayerRow key={r.name} name={r.name} whatsapp={r.whatsapp} paid={isPaid(r.name)} onTogglePaid={togglePaid} matchSettings={matchSettings} />
+          <PlayerRow key={r.name} name={r.name} whatsapp={r.whatsapp} paid={isPaid(r.name)} onTogglePaid={togglePaid} />
         ))}
       </div>
     </div>
