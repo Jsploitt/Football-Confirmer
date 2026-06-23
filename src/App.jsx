@@ -9,19 +9,19 @@ import Toast from './components/Toast'
 import { useAttendance } from './hooks/useAttendance'
 
 export default function App() {
-  const { confirmed, maybe, maxPlayers, paidPlayers, upsertPlayer, deletePlayer, togglePaid } = useAttendance()
+  const { confirmed, maybe, maxPlayers, upsertPlayer, deletePlayer } = useAttendance()
   const [toast, setToast] = useState(null)
 
   const showToast = useCallback((msg, type) => {
     setToast({ msg, type, id: Date.now() })
   }, [])
 
-  const handleRSVP = useCallback(async (name, status) => {
+  const handleRSVP = useCallback(async (name, status, whatsapp) => {
     if (status === 'cancelled') {
       await deletePlayer(name)
       showToast(`${name} removed from lists`, 'red')
     } else {
-      await upsertPlayer(name, status)
+      await upsertPlayer(name, status, whatsapp)
       if (status === 'confirmed') {
         showToast(`${name} confirmed ✓`, 'green')
       } else {
@@ -44,7 +44,7 @@ export default function App() {
         </div>
         <div className="section">
           <div className="section-title">Player Lists</div>
-          <PlayerLists confirmed={confirmed} maybe={maybe} paidPlayers={paidPlayers} onTogglePaid={togglePaid} />
+          <PlayerLists confirmed={confirmed} maybe={maybe} />
         </div>
         <PaymentSection />
         <MapSection />

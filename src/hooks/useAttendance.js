@@ -11,15 +11,14 @@ function useDebouncedCallback(fn, delay) {
 }
 
 export function useAttendance() {
-  const [confirmed, setConfirmed] = useState([])
-  const [maybe, setMaybe] = useState([])
+  const [records, setRecords] = useState([]) // [{ name, status, whatsapp }]
   const [maxPlayers, setMaxPlayers] = useState(14)
   const [paidPlayers, setPaidPlayers] = useState(new Set())
 
   const fetchAttendance = useCallback(async () => {
     const { data, error } = await supabase
       .from('attendance')
-      .select('name, status')
+      .select('name, status, whatsapp')
       .order('created_at', { ascending: true })
 
     if (error) {
@@ -27,8 +26,7 @@ export function useAttendance() {
       return
     }
 
-    setConfirmed(data.filter(r => r.status === 'confirmed').map(r => r.name))
-    setMaybe(data.filter(r => r.status === 'maybe').map(r => r.name))
+    setRecords(data)
   }, [])
 
   const fetchPayments = useCallback(async () => {
@@ -71,9 +69,9 @@ export function useAttendance() {
   const debouncedFetch = useDebouncedCallback(fetchAttendance, 400)
 
   // Case-insensitive upsert: delete any existing name match, then insert fresh row
-  const upsertPlayer = useCallback(async (name, status) => {
+  const upsertPlayer = useCallback(async (name, status, whatsapp) => {
     await supabase.from('attendance').delete().ilike('name', name)
-    const { error } = await supabase.from('attendance').insert({ name, status })
+    const { error } = await supabase.from('attendance').insert({ name, status, whatsapp })
     if (error) throw error
   }, [])
 
@@ -112,5 +110,20 @@ export function useAttendance() {
     return () => supabase.removeChannel(channel)
   }, [fetchAttendance, fetchConfig, fetchPayments, debouncedFetch])
 
-  return { confirmed, maybe, maxPlayers, paidPlayers, upsertPlayer, deletePlayer, togglePaid }
+  const confirmed = records.filter(r => r.status === 'confirmed').map(r => r.name)
+  const maybe = records.filter(r => r.status === 'maybe').map(r => r.name)
+  const confirmedRecords = records.filter(r => r.status === 'confirmed')
+  const maybeRecords = records.filter(r => r.status === 'maybe')
+
+  return {
+    confirmed,
+    maybe,
+    confirmedRecords,
+    maybeRecords,
+    maxPlayers,
+    paidPlayers,
+    upsertPlayer,
+    deletePlayer,
+    togglePaid,
+  }
 }

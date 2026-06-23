@@ -6,3 +6,8 @@
   for = "/*.svg"
   [headers.values]
     Content-Type = "image/svg+xml"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
