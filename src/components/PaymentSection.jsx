@@ -26,6 +26,7 @@ const BANKS = [
       </svg>
     ),
     accountName: 'MOUTAZ FADI RABAH JABER',
+    phone: '+966538445831',
     accountNumber: '1116244458',
     iban: 'SA5178000000001116244458',
   },
@@ -124,6 +125,15 @@ export default function PaymentSection() {
               <CopyButton value={bank.accountName} />
             </div>
           </div>
+          {bank.phone && (
+            <div className="payment-field">
+              <span className="payment-field__label">Phone Number</span>
+              <div className="payment-field__row">
+                <span className="payment-field__value">{bank.phone}</span>
+                <CopyButton value={bank.phone} />
+              </div>
+            </div>
+          )}
           <div className="payment-field">
             <span className="payment-field__label">Account Number</span>
             <div className="payment-field__row">

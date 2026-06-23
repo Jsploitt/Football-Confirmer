@@ -14,16 +14,32 @@ function EmptyState() {
   )
 }
 
-function PlayerBadge({ name, type }) {
+function PaidBadge({ paid, onToggle }) {
+  return (
+    <button
+      className={`paid-badge ${paid ? 'paid-badge--paid' : 'paid-badge--unpaid'}`}
+      onClick={e => { e.stopPropagation(); onToggle() }}
+      aria-label={paid ? 'Mark as not paid' : 'Mark as paid'}
+      title={paid ? 'Mark as not paid' : 'Mark as paid'}
+    >
+      {paid ? '✓ Paid' : 'Not paid'}
+    </button>
+  )
+}
+
+function PlayerBadge({ name, type, paid, onTogglePaid }) {
   return (
     <div className={`player-badge player-badge-${type}`}>
       <div className={`player-avatar player-avatar-${type}`}>{getInitial(name)}</div>
       <span className="player-name">{name}</span>
+      <PaidBadge paid={paid} onToggle={() => onTogglePaid(name, paid)} />
     </div>
   )
 }
 
-export default function PlayerLists({ confirmed, maybe }) {
+export default function PlayerLists({ confirmed, maybe, paidPlayers, onTogglePaid }) {
+  const isPaid = name => paidPlayers.has(name.toLowerCase())
+
   return (
     <div className="lists-grid">
 
@@ -41,7 +57,15 @@ export default function PlayerLists({ confirmed, maybe }) {
         <div className="player-list" aria-live="polite" aria-label="Confirmed players">
           {confirmed.length === 0
             ? <EmptyState />
-            : confirmed.map(name => <PlayerBadge key={name} name={name} type="confirmed" />)
+            : confirmed.map(name => (
+                <PlayerBadge
+                  key={name}
+                  name={name}
+                  type="confirmed"
+                  paid={isPaid(name)}
+                  onTogglePaid={onTogglePaid}
+                />
+              ))
           }
         </div>
       </div>
@@ -61,7 +85,15 @@ export default function PlayerLists({ confirmed, maybe }) {
         <div className="player-list" aria-live="polite" aria-label="Maybe players">
           {maybe.length === 0
             ? <EmptyState />
-            : maybe.map(name => <PlayerBadge key={name} name={name} type="maybe" />)
+            : maybe.map(name => (
+                <PlayerBadge
+                  key={name}
+                  name={name}
+                  type="maybe"
+                  paid={isPaid(name)}
+                  onTogglePaid={onTogglePaid}
+                />
+              ))
           }
         </div>
       </div>

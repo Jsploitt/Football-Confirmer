@@ -20,7 +20,7 @@ export default function Hero() {
 
         <h1 className="hero-title">
           Thu<span>,</span><br />
-          <span>11</span> June
+          <span>25</span> June
         </h1>
 
         <div className="hero-meta">

@@ -9,7 +9,7 @@ import Toast from './components/Toast'
 import { useAttendance } from './hooks/useAttendance'
 
 export default function App() {
-  const { confirmed, maybe, maxPlayers, upsertPlayer, deletePlayer } = useAttendance()
+  const { confirmed, maybe, maxPlayers, paidPlayers, upsertPlayer, deletePlayer, togglePaid } = useAttendance()
   const [toast, setToast] = useState(null)
 
   const showToast = useCallback((msg, type) => {
@@ -44,13 +44,13 @@ export default function App() {
         </div>
         <div className="section">
           <div className="section-title">Player Lists</div>
-          <PlayerLists confirmed={confirmed} maybe={maybe} />
+          <PlayerLists confirmed={confirmed} maybe={maybe} paidPlayers={paidPlayers} onTogglePaid={togglePaid} />
         </div>
         <PaymentSection />
         <MapSection />
       </main>
       <footer>
-        Thursday 11 June · 9:00–10:30 PM · Update your response at any time.
+        Thursday 25 June · 9:00–10:30 PM · Update your response at any time.
       </footer>
       <Toast toast={toast} />
     </>
