@@ -50,7 +50,7 @@ export default function App() {
         <MapSection />
       </main>
       <footer>
-        Thursday 11 June · 9:00–10:30 PM · Update your response at any time.
+        Thursday 25 June · 9:00–10:30 PM · Update your response at any time.
       </footer>
       <Toast toast={toast} />
     </>

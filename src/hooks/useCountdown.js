@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 function getKickoffDate() {
   const now = new Date()
   const year = now.getFullYear()
-  const target = new Date(year, 5, 11, 21, 0, 0) // June is month 5 (0-indexed)
+  const target = new Date(year, 5, 25, 21, 0, 0) // June is month 5 (0-indexed)
   if (target < now) target.setFullYear(year + 1)
   return target
 }

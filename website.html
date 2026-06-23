@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Matchday — Thursday 11 June</title>
+  <title>Matchday — Thursday 25 June</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
@@ -652,7 +652,7 @@
 
       <h1 class="hero-title">
         Thu<span>,</span><br>
-        <span>11</span> June
+        <span>25</span> June
       </h1>
 
       <div class="hero-meta">
@@ -825,7 +825,7 @@
   </main>
 
   <footer>
-    Thursday 11 June · 9:00–10:30 PM · Update your response at any time.
+    Thursday 25 June · 9:00–10:30 PM · Update your response at any time.
   </footer>
 
   <!-- Toast notification -->
@@ -988,10 +988,10 @@
     ================================================================ */
 
     function getKickoffDate() {
-      // Thursday 11 June, current year, 21:00 local time
+      // Thursday 25 June, current year, 21:00 local time
       const now    = new Date();
       const year   = now.getFullYear();
-      const target = new Date(year, 5, 11, 21, 0, 0); // month is 0-indexed; 5 = June
+      const target = new Date(year, 5, 25, 21, 0, 0); // month is 0-indexed; 5 = June
       // If kickoff has already passed this year, show next year
       if (target < now) target.setFullYear(year + 1);
       return target;
