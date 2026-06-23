@@ -10,7 +10,7 @@ import { useAttendance } from './hooks/useAttendance'
 import { formatKickoff } from './lib/matchDate'
 
 export default function App() {
-  const { confirmed, maybe, maxPlayers, upsertPlayer, deletePlayer } = useAttendance()
+  const { confirmed, maybe, maxPlayers, matchSettings, upsertPlayer, deletePlayer } = useAttendance()
   const [toast, setToast] = useState(null)
 
   const showToast = useCallback((msg, type) => {
