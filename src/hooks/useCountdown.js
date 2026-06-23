@@ -1,15 +1,8 @@
 import { useState, useEffect } from 'react'
 
-function getKickoffDate() {
-  const now = new Date()
-  const year = now.getFullYear()
-  const target = new Date(year, 5, 25, 21, 0, 0) // June is month 5 (0-indexed)
-  if (target < now) target.setFullYear(year + 1)
-  return target
-}
-
-function computeCountdown() {
-  const diff = getKickoffDate() - new Date()
+function computeCountdown(kickoffAt) {
+  if (!kickoffAt) return null
+  const diff = new Date(kickoffAt) - new Date()
   if (diff <= 0) return null
   const totalSecs = Math.floor(diff / 1000)
   return {
@@ -20,13 +13,14 @@ function computeCountdown() {
   }
 }
 
-export function useCountdown() {
-  const [countdown, setCountdown] = useState(computeCountdown)
+export function useCountdown(kickoffAt) {
+  const [countdown, setCountdown] = useState(() => computeCountdown(kickoffAt))
 
   useEffect(() => {
-    const id = setInterval(() => setCountdown(computeCountdown()), 1000)
+    setCountdown(computeCountdown(kickoffAt))
+    const id = setInterval(() => setCountdown(computeCountdown(kickoffAt)), 1000)
     return () => clearInterval(id)
-  }, [])
+  }, [kickoffAt])
 
   return countdown
 }

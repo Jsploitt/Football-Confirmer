@@ -828,4 +828,5 @@ footer {
   .rsvp-input-wrap { flex-direction: column; }
   .rsvp-input { min-width: unset; }
   .cd-unit { min-width: 54px; }
+  .admin-settings-grid { grid-template-columns: 1fr; }
 }

@@ -14,6 +14,15 @@ export function useAttendance() {
   const [records, setRecords] = useState([]) // [{ name, status, whatsapp }]
   const [maxPlayers, setMaxPlayers] = useState(14)
   const [paidPlayers, setPaidPlayers] = useState(new Set())
+  const [matchSettings, setMatchSettings] = useState({
+    id: null,
+    kickoffAt: null,
+    durationMinutes: 90,
+    locationName: '',
+    locationAddress: '',
+    mapEmbedUrl: '',
+    directionsUrl: '',
+  })
 
   const fetchAttendance = useCallback(async () => {
     const { data, error } = await supabase
@@ -56,13 +65,26 @@ export function useAttendance() {
   const fetchConfig = useCallback(async () => {
     const { data, error } = await supabase
       .from('config')
-      .select('max_players')
+      .select('id, max_players, kickoff_at, duration_minutes, location_name, location_address, map_embed_url, directions_url')
+      .order('id', { ascending: true })
+      .limit(1)
       .single()
     if (error) {
       console.error('fetchConfig:', error.message)
       return
     }
-    if (data) setMaxPlayers(data.max_players)
+    if (data) {
+      setMaxPlayers(data.max_players)
+      setMatchSettings({
+        id: data.id,
+        kickoffAt: data.kickoff_at,
+        durationMinutes: data.duration_minutes,
+        locationName: data.location_name ?? '',
+        locationAddress: data.location_address ?? '',
+        mapEmbedUrl: data.map_embed_url ?? '',
+        directionsUrl: data.directions_url ?? '',
+      })
+    }
   }, [])
 
   // 400 ms debounce — burst of realtime events becomes one SELECT
@@ -82,6 +104,23 @@ export function useAttendance() {
       .ilike('name', name)
     if (error) throw error
   }, [])
+
+  const updateMatchSettings = useCallback(async ({
+    kickoffAt, durationMinutes, locationName, locationAddress, mapEmbedUrl, directionsUrl,
+  }) => {
+    const { error } = await supabase
+      .from('config')
+      .update({
+        kickoff_at: kickoffAt,
+        duration_minutes: durationMinutes,
+        location_name: locationName,
+        location_address: locationAddress,
+        map_embed_url: mapEmbedUrl,
+        directions_url: directionsUrl,
+      })
+      .eq('id', matchSettings.id)
+    if (error) throw error
+  }, [matchSettings.id])
 
   useEffect(() => {
     fetchConfig()

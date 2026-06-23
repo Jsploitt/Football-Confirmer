@@ -1,9 +1,11 @@
 import { useCountdown } from '../hooks/useCountdown'
+import { formatKickoff } from '../lib/matchDate'
 
 const pad = n => String(n).padStart(2, '0')
 
-export default function Hero() {
-  const countdown = useCountdown()
+export default function Hero({ kickoffAt, durationMinutes }) {
+  const countdown = useCountdown(kickoffAt)
+  const fmt = formatKickoff(kickoffAt, durationMinutes)
 
   return (
     <header className="hero pitch-bg">
@@ -19,8 +21,14 @@ export default function Hero() {
         </div>
 
         <h1 className="hero-title">
-          Thu<span>,</span><br />
-          <span>25</span> June
+          {fmt ? (
+            <>
+              {fmt.weekdayShort}<span>,</span><br />
+              <span>{fmt.day}</span> {fmt.month}
+            </>
+          ) : (
+            'Loading…'
+          )}
         </h1>
 
         <div className="hero-meta">
@@ -28,7 +36,7 @@ export default function Hero() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
             </svg>
-            9:00 PM – 10:30 PM
+            {fmt ? `${fmt.startLabel} – ${fmt.endLabel}` : '—'}
           </span>
           <span className="hero-meta-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

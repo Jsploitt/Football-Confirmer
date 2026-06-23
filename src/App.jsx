@@ -7,6 +7,7 @@ import MapSection from './components/MapSection'
 import PaymentSection from './components/PaymentSection'
 import Toast from './components/Toast'
 import { useAttendance } from './hooks/useAttendance'
+import { formatKickoff } from './lib/matchDate'
 
 export default function App() {
   const { confirmed, maybe, maxPlayers, upsertPlayer, deletePlayer } = useAttendance()
@@ -30,9 +31,11 @@ export default function App() {
     }
   }, [upsertPlayer, deletePlayer, showToast])
 
+  const fmt = formatKickoff(matchSettings.kickoffAt, matchSettings.durationMinutes)
+
   return (
     <>
-      <Hero />
+      <Hero kickoffAt={matchSettings.kickoffAt} durationMinutes={matchSettings.durationMinutes} />
       <main>
         <div className="section" style={{ paddingBottom: 0 }}>
           <div className="section-title">Squad Status</div>
@@ -47,10 +50,16 @@ export default function App() {
           <PlayerLists confirmed={confirmed} maybe={maybe} />
         </div>
         <PaymentSection />
-        <MapSection />
+        <MapSection
+          locationName={matchSettings.locationName}
+          mapEmbedUrl={matchSettings.mapEmbedUrl}
+          directionsUrl={matchSettings.directionsUrl}
+        />
       </main>
       <footer>
-        Thursday 25 June · 9:00–10:30 PM · Update your response at any time.
+        {fmt
+          ? `${fmt.weekdayLong} ${fmt.day} ${fmt.month} · ${fmt.startLabel} – ${fmt.endLabel} · Update your response at any time.`
+          : 'Update your response at any time.'}
       </footer>
       <Toast toast={toast} />
     </>
