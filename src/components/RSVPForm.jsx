@@ -8,6 +8,7 @@ function sanitizeName(raw) {
 
 export default function RSVPForm({ onRSVP }) {
   const [name, setName] = useState('')
+  const [whatsapp, setWhatsapp] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [cooldown, setCooldown] = useState(false)
@@ -15,17 +16,23 @@ export default function RSVPForm({ onRSVP }) {
 
   async function handleClick(status) {
     const clean = sanitizeName(name)
+    const cleanWhatsapp = whatsapp.trim()
     setError('')
 
     if (!clean) {
       setError('Enter your name before selecting a status.')
       return
     }
+    if (status !== 'cancelled' && !cleanWhatsapp) {
+      setError('Enter your WhatsApp number before selecting a status.')
+      return
+    }
 
     setLoading(true)
     try {
-      await onRSVP(clean, status)
+      await onRSVP(clean, status, cleanWhatsapp)
       setName('')
+      setWhatsapp('')
       // Block resubmission for COOLDOWN_MS after a successful write
       setCooldown(true)
       clearTimeout(cooldownTimer.current)
@@ -49,6 +56,19 @@ export default function RSVPForm({ onRSVP }) {
           aria-label="Player name"
           value={name}
           onChange={e => setName(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleClick('confirmed')}
+        />
+      </div>
+      <div className="rsvp-input-wrap">
+        <input
+          type="tel"
+          className="rsvp-input"
+          placeholder="WhatsApp number (e.g. +9665XXXXXXXX)…"
+          maxLength={20}
+          autoComplete="off"
+          aria-label="WhatsApp number"
+          value={whatsapp}
+          onChange={e => setWhatsapp(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleClick('confirmed')}
         />
       </div>

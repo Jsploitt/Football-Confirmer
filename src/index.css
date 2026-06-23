@@ -747,6 +747,81 @@ footer {
 }
 .copy-btn:hover { background: rgba(255,255,255,0.12); color: var(--white); }
 
+/* ─── Admin Page ────────────────────────────────────────────────── */
+.admin-login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.admin-login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.admin-login-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--white);
+}
+.admin-dashboard {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.admin-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 0.85rem;
+}
+.admin-row-name {
+  flex: 1;
+  font-weight: 500;
+  color: var(--white);
+}
+.remind-btn {
+  flex-shrink: 0;
+  background: rgba(76,175,80,0.15);
+  color: var(--green);
+  border: 1.5px solid rgba(76,175,80,0.35);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.remind-btn:hover { background: rgba(76,175,80,0.28); }
+.remind-btn--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* ─── Responsive tweaks ─────────────────────────────────────────── */
 @media (max-width: 480px) {
   .hero { padding: 2rem 1rem 3rem; }
