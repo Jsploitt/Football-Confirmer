@@ -77,6 +77,7 @@ export function useAttendance() {
       setMaxPlayers(data.max_players)
       setMatchSettings({
         id: data.id,
+        maxPlayers: data.max_players,
         kickoffAt: data.kickoff_at,
         durationMinutes: data.duration_minutes,
         locationName: data.location_name ?? '',
@@ -106,11 +107,12 @@ export function useAttendance() {
   }, [])
 
   const updateMatchSettings = useCallback(async ({
-    kickoffAt, durationMinutes, locationName, locationAddress, mapEmbedUrl, directionsUrl,
+    maxPlayers: newMaxPlayers, kickoffAt, durationMinutes, locationName, locationAddress, mapEmbedUrl, directionsUrl,
   }) => {
     const { error } = await supabase
       .from('config')
       .update({
+        max_players: newMaxPlayers,
         kickoff_at: kickoffAt,
         duration_minutes: durationMinutes,
         location_name: locationName,

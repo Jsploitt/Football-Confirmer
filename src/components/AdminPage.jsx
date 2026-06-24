@@ -123,6 +123,7 @@ function MatchSettingsForm({ matchSettings, updateMatchSettings }) {
   useEffect(() => {
     if (matchSettings.id !== null && form === null) {
       setForm({
+        maxPlayers: matchSettings.maxPlayers,
         kickoffLocal: toDatetimeLocalValue(matchSettings.kickoffAt),
         durationMinutes: matchSettings.durationMinutes,
         locationName: matchSettings.locationName,
@@ -145,6 +146,7 @@ function MatchSettingsForm({ matchSettings, updateMatchSettings }) {
     setStatus('')
     try {
       await updateMatchSettings({
+        maxPlayers: Number(form.maxPlayers) || 14,
         kickoffAt: fromDatetimeLocalValue(form.kickoffLocal),
         durationMinutes: Number(form.durationMinutes) || 90,
         locationName: form.locationName,
@@ -164,6 +166,18 @@ function MatchSettingsForm({ matchSettings, updateMatchSettings }) {
   return (
     <form className="admin-settings-card" onSubmit={handleSubmit}>
       <div className="admin-settings-grid">
+        <label className="admin-field">
+          <span className="admin-field-label">Number of players</span>
+          <input
+            type="number"
+            className="rsvp-input"
+            min={2}
+            step={1}
+            value={form.maxPlayers}
+            onChange={e => set('maxPlayers', e.target.value)}
+            required
+          />
+        </label>
         <label className="admin-field">
           <span className="admin-field-label">Kickoff date & time</span>
           <input
