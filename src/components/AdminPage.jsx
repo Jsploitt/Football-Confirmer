@@ -13,7 +13,7 @@ function buildWhatsAppLink(whatsapp, name, matchSettings) {
   const digits = whatsapp.replace(/[^\d]/g, '')
   const fmt = formatKickoff(matchSettings.kickoffAt, matchSettings.durationMinutes)
   const whenText = fmt ? `${fmt.weekdayLong} ${fmt.day} ${fmt.month}, ${fmt.startLabel}–${fmt.endLabel}` : 'the upcoming match'
-  const message = `Hey ${name}! 👋 Quick reminder about the match — ${whenText}${matchSettings.locationName ? ` at ${matchSettings.locationName}` : ''}. See you on the pitch! ⚽`
+  const message = `Hey ${name}! Quick reminder about the match — ${whenText}${matchSettings.locationName ? ` at ${matchSettings.locationName}` : ''}. See you on the pitch!`
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`
 }
 
