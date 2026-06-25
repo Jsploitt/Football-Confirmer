@@ -27,7 +27,7 @@ export function useAttendance() {
   const fetchAttendance = useCallback(async () => {
     const { data, error } = await supabase
       .from('attendance')
-      .select('name, status, whatsapp')
+      .select('name, status, whatsapp, locked')
       .order('created_at', { ascending: true })
 
     if (error) {
@@ -91,17 +91,32 @@ export function useAttendance() {
   // 400 ms debounce — burst of realtime events becomes one SELECT
   const debouncedFetch = useDebouncedCallback(fetchAttendance, 400)
 
+  const isLocked = useCallback(async (name) => {
+    const { data } = await supabase.from('attendance').select('locked').ilike('name', name).maybeSingle()
+    return data?.locked ?? false
+  }, [])
+
   // Case-insensitive upsert: delete any existing name match, then insert fresh row
   const upsertPlayer = useCallback(async (name, status, whatsapp) => {
+    if (await isLocked(name)) throw new Error('LOCKED')
     await supabase.from('attendance').delete().ilike('name', name)
     const { error } = await supabase.from('attendance').insert({ name, status, whatsapp })
     if (error) throw error
-  }, [])
+  }, [isLocked])
 
   const deletePlayer = useCallback(async (name) => {
+    if (await isLocked(name)) throw new Error('LOCKED')
     const { error } = await supabase
       .from('attendance')
       .delete()
+      .ilike('name', name)
+    if (error) throw error
+  }, [isLocked])
+
+  const toggleLocked = useCallback(async (name, currentlyLocked) => {
+    const { error } = await supabase
+      .from('attendance')
+      .update({ locked: !currentlyLocked })
       .ilike('name', name)
     if (error) throw error
   }, [])
@@ -167,6 +182,7 @@ export function useAttendance() {
     upsertPlayer,
     deletePlayer,
     togglePaid,
+    toggleLocked,
     updateMatchSettings,
   }
 }

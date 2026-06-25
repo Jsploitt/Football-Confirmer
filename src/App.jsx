@@ -18,15 +18,23 @@ export default function App() {
   }, [])
 
   const handleRSVP = useCallback(async (name, status, whatsapp) => {
-    if (status === 'cancelled') {
-      await deletePlayer(name)
-      showToast(`${name} removed from lists`, 'red')
-    } else {
-      await upsertPlayer(name, status, whatsapp)
-      if (status === 'confirmed') {
-        showToast(`${name} confirmed ✓`, 'green')
+    try {
+      if (status === 'cancelled') {
+        await deletePlayer(name)
+        showToast(`${name} removed from lists`, 'red')
       } else {
-        showToast(`${name} — marked as maybe`, 'amber')
+        await upsertPlayer(name, status, whatsapp)
+        if (status === 'confirmed') {
+          showToast(`${name} confirmed ✓`, 'green')
+        } else {
+          showToast(`${name} — marked as maybe`, 'amber')
+        }
+      }
+    } catch (err) {
+      if (err.message === 'LOCKED') {
+        showToast(`${name} is locked — contact the organizer to change this`, 'red')
+      } else {
+        throw err
       }
     }
   }, [upsertPlayer, deletePlayer, showToast])
