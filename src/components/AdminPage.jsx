@@ -75,7 +75,7 @@ function AdminLogin({ onLogin }) {
   )
 }
 
-function PlayerRow({ name, whatsapp, paid, onTogglePaid, matchSettings }) {
+function PlayerRow({ name, whatsapp, paid, locked, onTogglePaid, onToggleLocked, matchSettings }) {
   return (
     <div className="admin-row">
       <div className="player-avatar player-avatar-confirmed">{getInitial(name)}</div>
@@ -85,6 +85,13 @@ function PlayerRow({ name, whatsapp, paid, onTogglePaid, matchSettings }) {
         onClick={() => onTogglePaid(name, paid)}
       >
         {paid ? '✓ Paid' : 'Not paid'}
+      </button>
+      <button
+        className={`lock-badge ${locked ? 'lock-badge--locked' : 'lock-badge--unlocked'}`}
+        onClick={() => onToggleLocked(name, locked)}
+        title={locked ? 'Locked — player cannot cancel or change their RSVP' : 'Click to lock this player in'}
+      >
+        {locked ? '🔒 Locked' : '🔓 Lock'}
       </button>
       {whatsapp ? (
         <a
@@ -253,7 +260,7 @@ function MatchSettingsForm({ matchSettings, updateMatchSettings }) {
 
 function AdminDashboard({ onLogout }) {
   const {
-    confirmedRecords, maybeRecords, paidPlayers, togglePaid, matchSettings, updateMatchSettings,
+    confirmedRecords, maybeRecords, paidPlayers, togglePaid, toggleLocked, matchSettings, updateMatchSettings,
   } = useAttendance()
   const isPaid = name => paidPlayers.has(name.toLowerCase())
 
@@ -271,7 +278,7 @@ function AdminDashboard({ onLogout }) {
       <div className="admin-list">
         {confirmedRecords.length === 0 && <div className="empty-state"><div>No players yet</div></div>}
         {confirmedRecords.map(r => (
-          <PlayerRow key={r.name} name={r.name} whatsapp={r.whatsapp} paid={isPaid(r.name)} onTogglePaid={togglePaid} matchSettings={matchSettings} />
+          <PlayerRow key={r.name} name={r.name} whatsapp={r.whatsapp} paid={isPaid(r.name)} locked={r.locked} onTogglePaid={togglePaid} onToggleLocked={toggleLocked} matchSettings={matchSettings} />
         ))}
       </div>
 
@@ -279,7 +286,7 @@ function AdminDashboard({ onLogout }) {
       <div className="admin-list">
         {maybeRecords.length === 0 && <div className="empty-state"><div>No players yet</div></div>}
         {maybeRecords.map(r => (
-          <PlayerRow key={r.name} name={r.name} whatsapp={r.whatsapp} paid={isPaid(r.name)} onTogglePaid={togglePaid} matchSettings={matchSettings} />
+          <PlayerRow key={r.name} name={r.name} whatsapp={r.whatsapp} paid={isPaid(r.name)} locked={r.locked} onTogglePaid={togglePaid} onToggleLocked={toggleLocked} matchSettings={matchSettings} />
         ))}
       </div>
     </div>
